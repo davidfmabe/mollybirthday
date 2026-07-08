@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday, Molly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Caveat:wght@500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sand: #F5E6C8;
+    --sand-deep: #E8D19E;
+    --ocean: #0F6E85;
+    --ocean-deep: #0B4F63;
+    --ink: #133646;
+    --coral: #FF6F59;
+    --coral-deep: #E5533E;
+    --sun: #FFC94D;
+    --foam: #FFFBF2;
+    --line: rgba(19,54,70,0.14);
+    --shadow: 0 10px 30px rgba(11,79,99,0.14);
+    --good: #2E8B57;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background: linear-gradient(180deg, #CDEAF0 0%, var(--sand) 14%, var(--sand) 100%);
+    color:var(--ink);
+    font-family:'Nunito', sans-serif;
+    overflow-x:hidden;
+  }
+  h1,h2,h3{ font-family:'Fraunces', serif; margin:0 0 .3em 0; font-weight:600; line-height:1.1; }
+  .script{ font-family:'Caveat', cursive; font-weight:700; }
+  p{line-height:1.5;}
+  .wrap{max-width:640px; margin:0 auto; padding:0 20px;}
+
+  #sun-track{ position:fixed; top:0; left:0; right:0; height:100vh; pointer-events:none; z-index:5; }
+  #sun-arc-path{ opacity:.35; }
+  #sun-dot{ filter: drop-shadow(0 0 14px rgba(255,201,77,0.85)); cursor:pointer; pointer-events:auto; }
+  #sun-time-label{
+    position:fixed; top:14px; right:16px; font-family:'Caveat', cursive; font-size:1.2rem; color:var(--ocean-deep);
+    background:rgba(255,251,240,0.75); padding:4px 12px; border-radius:20px; z-index:6; backdrop-filter: blur(3px);
+  }
+
+  .hero{ position:relative; padding:70px 20px 50px; text-align:center; overflow:hidden; }
+  .hero .eyebrow{ font-family:'Caveat', cursive; font-size:1.4rem; color:var(--coral-deep); }
+  .hero h1{ font-size:clamp(2.4rem, 9vw, 3.4rem); color:var(--ocean-deep); }
+  .hero .sub{ font-size:1.05rem; max-width:420px; margin:14px auto 0; color:var(--ink); opacity:.85; }
+  .waves{ display:block; width:100%; height:60px; margin-top:30px; }
+  .umbrella{ width:120px; height:auto; margin:10px auto 0; display:block; }
+
+  section.block{ padding:34px 0 6px; }
+  .section-label{ font-family:'Caveat', cursive; font-size:1.3rem; color:var(--coral-deep); margin-bottom:2px; }
+  .card{ background:var(--foam); border-radius:22px; box-shadow:var(--shadow); border:1px solid var(--line); overflow:hidden; margin-bottom:18px; }
+  .card-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .card-head h3{ font-size:1.25rem; color:var(--ocean-deep); }
+  .card-head .icon{ font-size:1.6rem; }
+  .head-left{ display:flex; align-items:center; gap:12px; }
+  .head-right{ display:flex; align-items:center; gap:10px; }
+  .status-pill{ font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.03em; padding:4px 10px; border-radius:999px; background:var(--line); color:var(--ink); opacity:.6; white-space:nowrap; }
+  .status-pill.locked{ background:rgba(46,139,87,0.15); color:var(--good); opacity:1; }
+  .status-pill.dirty{ background:rgba(255,111,89,0.18); color:var(--coral-deep); opacity:1; }
+  .chev{ transition: transform .25s ease; color:var(--ocean); font-size:1.1rem; }
+  .card.open .chev{ transform: rotate(180deg); }
+  .card-body{ max-height:0; overflow:hidden; transition: max-height .35s ease; padding:0 20px; }
+  .card.open .card-body{ padding:0 20px 20px; }
+  .hint{ background:rgba(15,110,133,0.08); border-left:3px solid var(--ocean); padding:10px 14px; border-radius:10px; font-size:.92rem; margin-bottom:16px; }
+  .warn{ background:rgba(255,111,89,0.12); border-left:3px solid var(--coral); padding:10px 14px; border-radius:10px; font-size:.92rem; margin-top:10px; display:none; }
+  .warn.show{ display:block; }
+
+  label.field-label{ display:block; font-weight:700; font-size:.85rem; text-transform:uppercase; letter-spacing:.04em; color:var(--ocean-deep); margin:14px 0 6px; }
+  input[type="time"], select, input[type="text"]{ width:100%; font-family:'Nunito', sans-serif; font-size:1rem; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:#fff; color:var(--ink); }
+  .choice-grid{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{ position:relative; }
+  .chip input{ position:absolute; opacity:0; width:100%; height:100%; cursor:pointer; }
+  .chip span{ display:inline-block; padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:#fff; font-size:.9rem; font-weight:700; color:var(--ink); transition: all .15s ease; }
+  .chip input:checked + span{ background:var(--ocean); border-color:var(--ocean); color:#fff; }
+  .chip.radio input:checked + span{ background:var(--coral); border-color:var(--coral); }
+  .sub-panel{ margin-top:12px; padding:12px 14px; background:var(--sand); border-radius:12px; display:none; }
+  .sub-panel.show{ display:block; }
+  .lock-row{ display:flex; align-items:center; gap:12px; margin-top:8px; }
+  .toggle{ width:50px; height:28px; background:var(--line); border-radius:20px; position:relative; cursor:pointer; flex:none; transition: background .2s ease; }
+  .toggle.on{ background:var(--coral); }
+  .toggle .knob{ position:absolute; top:3px; left:3px; width:22px; height:22px; background:#fff; border-radius:50%; transition: transform .2s ease; box-shadow:0 1px 4px rgba(0,0,0,.25); }
+  .toggle.on .knob{ transform: translateX(22px); }
+
+  .weather-card{ background:linear-gradient(160deg, #fff, #F3F8FA); }
+  .weather-top{ display:flex; align-items:center; justify-content:space-between; padding:18px 20px 6px; }
+  .weather-temp{ font-size:2.6rem; font-weight:800; font-family:'Fraunces', serif; color:var(--ocean-deep); }
+  .weather-icon{ font-size:2.2rem; }
+  .weather-desc{ padding:0 20px 14px; font-size:.95rem; opacity:.8; }
+  .weather-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 20px 20px; }
+  .weather-item{ background:#fff; border-radius:12px; padding:10px 12px; border:1px solid var(--line); }
+  .weather-item .wl{ font-size:.75rem; text-transform:uppercase; opacity:.6; font-weight:700; }
+  .weather-item .wv{ font-weight:800; font-size:1.05rem; margin-top:2px;}
+  .hourly-strip{
+    display:flex; gap:4px; overflow-x:auto; padding:16px 20px 20px;
+    border-top:1px solid var(--line); margin-top:2px;
+    -webkit-overflow-scrolling:touch; scrollbar-width:none;
+  }
+  .hourly-strip::-webkit-scrollbar{ display:none; }
+  .hour-item{
+    flex:none; width:64px; text-align:center; display:flex; flex-direction:column;
+    align-items:center; gap:4px; padding:6px 2px;
+  }
+  .hour-item .hr-time{ font-size:.78rem; font-weight:800; color:var(--ocean-deep); }
+  .hour-item .hr-icon{ font-size:1.3rem; }
+  .hour-item .hr-temp{ font-size:.95rem; font-weight:800; }
+  .hour-item .hr-pct{ font-size:.72rem; color:var(--ocean); opacity:.85; }
+
+  .horoscope-card{ background:linear-gradient(160deg, #fff, #F7F0FA); }
+  .horoscope-top{ display:flex; align-items:center; gap:14px; padding:18px 20px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .horoscope-sign{ font-size:2.2rem; color:var(--coral-deep); }
+  .horoscope-label{ font-family:'Fraunces', serif; font-weight:700; font-size:1.15rem; color:var(--ocean-deep); }
+  .horoscope-date{ font-size:.85rem; opacity:.65; margin-bottom:4px; }
+  .horoscope-preview{ font-size:.88rem; opacity:.75; font-style:italic; }
+  .horoscope-text{ font-size:.98rem; line-height:1.6; }
+
+  .lock-action-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:18px; padding-top:16px; border-top:1px dashed var(--line); }
+  .lock-note{ font-size:.82rem; opacity:.65; }
+  .lock-btn{ background:var(--ocean); color:#fff; border:none; padding:10px 18px; border-radius:999px; font-family:'Nunito', sans-serif; font-weight:800; font-size:.9rem; cursor:pointer; white-space:nowrap; transition: transform .12s ease, background .2s ease; }
+  .lock-btn:active{ transform: scale(.96); }
+  .lock-btn.locked-state{ background:var(--good); }
+  .lock-btn.dirty-state{ background:var(--coral-deep); }
+  .send-ping{ font-size:.78rem; color:var(--good); min-height:1em; margin-top:4px; }
+
+  .timeline{ position:relative; padding-left:26px; }
+  .timeline::before{ content:''; position:absolute; left:9px; top:6px; bottom:6px; width:2px; background:var(--line); }
+  .t-item{ position:relative; margin-bottom:16px; }
+  .t-item::before{ content:''; position:absolute; left:-26px; top:4px; width:12px; height:12px; border-radius:50%; background:var(--good); border:2px solid var(--foam); }
+  .t-item.pending::before{ background:var(--line); }
+  .t-time{ font-weight:800; color:var(--ocean-deep); font-size:.95rem; }
+  .t-desc{ font-size:.9rem; opacity:.85; }
+  .t-item.pending .t-time, .t-item.pending .t-desc{ opacity:.45; }
+
+  .note-hint{ text-align:center; font-size:.85rem; opacity:.65; padding:14px 20px 0; }
+
+  .note-card{ background: linear-gradient(160deg, var(--foam), #fff); text-align:center; padding:26px 22px; }
+  .note-text{ font-family:'Caveat', cursive; font-size:1.6rem; color:var(--ocean-deep); line-height:1.4; }
+  .note-count{ font-size:.85rem; opacity:.6; margin-top:10px; }
+  .reveal-btn{
+    background:var(--coral); color:#fff; border:none; padding:16px 28px; border-radius:999px;
+    font-family:'Nunito', sans-serif; font-weight:800; font-size:1rem; cursor:pointer;
+    box-shadow:0 8px 20px rgba(255,111,89,0.35);
+  }
+  .reveal-btn:active{ transform: scale(.97); }
+  .history-toggle{
+    display:block; width:100%; text-align:center; background:none; border:none;
+    padding:14px 20px; font-family:'Nunito', sans-serif; font-weight:700; font-size:.88rem;
+    color:var(--ocean-deep); cursor:pointer; border-top:1px solid var(--line);
+  }
+  .history-list{ display:none; padding:0 22px 20px; }
+  .history-list.show{ display:block; }
+  .history-item{ padding:12px 0; border-bottom:1px dashed var(--line); font-family:'Caveat', cursive; font-size:1.25rem; color:var(--ink); }
+  .history-item:last-child{ border-bottom:none; }
+
+  .video-grid{ display:flex; flex-direction:column; gap:16px; }
+  .video-slot{ background:var(--foam); border-radius:18px; overflow:hidden; border:1px solid var(--line); }
+  .video-slot .who{ padding:12px 16px; font-family:'Caveat', cursive; font-size:1.3rem; color:var(--coral-deep); }
+  .video-frame{ position:relative; padding-bottom:177.78%; height:0; max-width:340px; margin:0 auto; background:#dfe9ea; }
+  .video-frame iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+  .video-fallback{
+    display:block; text-align:center; font-size:.8rem; color:var(--ocean);
+    padding:10px 16px 16px; text-decoration:none; opacity:.75;
+  }
+  .video-placeholder{ display:flex; align-items:center; justify-content:center; height:100%; width:100%; position:absolute; inset:0; color:var(--ocean-deep); font-weight:700; font-size:.95rem; text-align:center; padding:20px; }
+
+  footer{ text-align:center; padding:50px 20px 70px; font-family:'Caveat', cursive; font-size:1.3rem; color:var(--ocean-deep); opacity:.75; }
+
+  .confetti-piece{ position:fixed; top:-10px; width:8px; height:14px; z-index:50; pointer-events:none; border-radius:2px; }
+  .egg-msg{ position:fixed; left:50%; bottom:30px; transform:translateX(-50%) translateY(20px); background:var(--ocean-deep); color:#fff; padding:12px 20px; border-radius:14px; font-family:'Caveat', cursive; font-size:1.2rem; z-index:60; opacity:0; transition:all .35s ease; pointer-events:none; text-align:center; max-width:80vw; }
+  .egg-msg.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  #summon-btn{
+    position:fixed; right:18px; bottom:24px; z-index:40;
+    width:58px; height:58px; border-radius:50%; border:none;
+    background:var(--coral); color:#fff; font-size:1.6rem;
+    box-shadow:0 10px 24px rgba(255,111,89,0.45);
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  #summon-btn:active{ transform: scale(.94); }
+  #summon-overlay{
+    display:none; position:fixed; inset:0; background:rgba(11,79,99,0.45);
+    z-index:70; align-items:flex-end; justify-content:center;
+  }
+  #summon-overlay.show{ display:flex; }
+  #summon-panel{
+    background:var(--foam); width:100%; max-width:480px; border-radius:24px 24px 0 0;
+    padding:24px 22px 30px; position:relative; box-shadow:0 -10px 30px rgba(0,0,0,0.2);
+  }
+  #summon-close{
+    position:absolute; top:16px; right:18px; font-size:1.1rem; color:var(--ocean-deep);
+    cursor:pointer; opacity:.6;
+  }
+  #summon-text{
+    width:100%; font-family:'Nunito', sans-serif; font-size:1rem; padding:12px 14px;
+    border-radius:12px; border:1px solid var(--line); background:#fff; color:var(--ink);
+    resize:vertical;
+  }
+  #summon-status{ margin-top:10px; font-size:.85rem; color:var(--ocean-deep); min-height:1.2em; }
+
+  #onboarding-banner{
+    position:fixed; top:0; left:0; right:0; z-index:90;
+    background:var(--ocean-deep); color:#fff; padding:12px 16px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    font-size:.84rem; line-height:1.3;
+    transform:translateY(-100%); transition:transform .4s ease;
+  }
+  #onboarding-banner.show{ transform:translateY(0); }
+  #onboarding-dismiss{
+    background:rgba(255,255,255,0.2); border:none; color:#fff; padding:7px 14px;
+    border-radius:999px; font-weight:800; font-size:.78rem; cursor:pointer;
+    white-space:nowrap; flex:none;
+  }
+
+  @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } *{ transition:none !important; animation:none !important; } }
+</style>
+</head>
+<body>
+
+<div id="onboarding-banner">
+  <span>For the smoothest day, tap the Share icon at the bottom of your screen, then <strong>Add to Home Screen</strong> 🏖️</span>
+  <button id="onboarding-dismiss">Got it</button>
+</div>
+
+<div id="sun-track">
+  <svg width="100%" height="100%" preserveAspectRatio="none" style="position:absolute; inset:0;">
+    <path id="sun-arc-path" d="" stroke="#0B4F63" stroke-width="2" stroke-dasharray="1 8" fill="none" stroke-linecap="round"/>
+  </svg>
+  <svg width="46" height="46" id="sun-dot" style="position:absolute;">
+    <circle cx="23" cy="23" r="15" fill="#FFC94D"/>
+  </svg>
+</div>
+<div id="sun-time-label">6:10am</div>
+
+<header class="hero">
+  <div class="eyebrow">a whole day, just for you</div>
+  <h1>Happy Birthday,<br>Molly</h1>
+  <p class="sub">Set each piece of your day as you go — and change your mind anytime. Nothing here is set in stone but what you decide it should be.</p>
+  <svg class="umbrella" viewBox="0 0 100 100" id="umbrella-egg">
+    <path d="M50 20 C25 20 10 45 10 45 L90 45 C90 45 75 20 50 20 Z" fill="#FF6F59"/>
+    <path d="M10 45 L50 20 L50 45 Z" fill="#E5533E"/>
+    <path d="M50 20 L90 45 L50 45 Z" fill="#FF6F59"/>
+    <rect x="48" y="45" width="4" height="45" fill="#0B4F63"/>
+    <path d="M40 90 Q50 100 60 90" stroke="#0B4F63" stroke-width="4" fill="none" stroke-linecap="round"/>
+  </svg>
+  <svg class="waves" viewBox="0 0 400 40" preserveAspectRatio="none">
+    <path d="M0 20 Q 25 5, 50 20 T 100 20 T 150 20 T 200 20 T 250 20 T 300 20 T 350 20 T 400 20" stroke="#0F6E85" stroke-width="3" fill="none" opacity="0.5"/>
+    <path d="M0 30 Q 25 15, 50 30 T 100 30 T 150 30 T 200 30 T 250 30 T 300 30 T 350 30 T 400 30" stroke="#0F6E85" stroke-width="3" fill="none" opacity="0.3"/>
+  </svg>
+</header>
+
+<div class="wrap">
+
+  <section class="block">
+    <div class="section-label">how the sky looks</div>
+    <div class="card weather-card" style="box-shadow:var(--shadow);">
+      <div class="weather-top">
+        <div>
+          <div style="font-weight:800; font-size:.85rem; text-transform:uppercase; opacity:.6;">Thursday</div>
+          <div class="weather-temp" id="wx-temp">92°</div>
+        </div>
+        <div class="weather-icon">☀️</div>
+      </div>
+      <div class="weather-desc" id="wx-desc">Sunny with a few clouds. Winds SW at 15–25 mph. Great beach weather all day.</div>
+      <div class="weather-grid">
+        <div class="weather-item"><div class="wl">Humidity</div><div class="wv" id="wx-humidity">69%</div></div>
+        <div class="weather-item"><div class="wl">UV Index</div><div class="wv" id="wx-uv">Extreme</div></div>
+        <div class="weather-item"><div class="wl">Sunrise</div><div class="wv">6:10 am</div></div>
+        <div class="weather-item"><div class="wl">Sunset</div><div class="wv">8:27 pm</div></div>
+      </div>
+      <div class="hourly-strip" id="hourly-strip"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="section-label">what the stars say</div>
+    <div class="card horoscope-card" data-card>
+      <div class="horoscope-top" data-toggle>
+        <span class="horoscope-sign">♋</span>
+        <div style="flex:1;">
+          <div class="horoscope-label">Cancer</div>
+          <div class="horoscope-date">Week of July 6–12</div>
+          <div class="horoscope-preview" id="horoscope-preview"></div>
+        </div>
+        <span class="chev">⌄</span>
+      </div>
+      <div class="card-body">
+        <div class="horoscope-text" id="horoscope-text" style="padding-bottom:18px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="section-label">build your day</div>
+    <h2 style="color:var(--ocean-deep); margin-bottom:14px;">Set each piece as you go</h2>
+
+    <!-- BREAKFAST -->
+    <div class="card" data-card data-section="breakfast">
+      <div class="card-head" data-toggle>
+        <div class="head-left"><span class="icon">🥞</span><h3>Breakfast</h3></div>
+        <div class="head-right"><span class="status-pill" data-status="breakfast">not set</span><span class="chev">⌄</span></div>
+      </div>
+      <div class="card-body">
+        <label class="field-label">What time?</label>
+        <input type="time" id="bf-time" value="08:30">
+
+        <label class="field-label">Something to drink</label>
+        <div class="choice-grid" data-group="bf-drink">
+          <label class="chip"><input type="checkbox" value="Coffee"><span>Coffee</span></label>
+          <label class="chip"><input type="checkbox" value="Tea"><span>Tea</span></label>
+          <label class="chip"><input type="checkbox" value="Orange juice"><span>Orange juice</span></label>
+          <label class="chip"><input type="checkbox" value="Water"><span>Water</span></label>
+        </div>
+
+        <label class="field-label">Fruit or a side</label>
+        <div class="choice-grid" data-group="bf-side">
+          <label class="chip"><input type="checkbox" value="Cantaloupe"><span>Cantaloupe</span></label>
+          <label class="chip"><input type="checkbox" value="Strawberries"><span>Strawberries</span></label>
+          <label class="chip"><input type="checkbox" value="Blueberries"><span>Blueberries</span></label>
+          <label class="chip"><input type="checkbox" value="Granola" data-reveals="bf-yogurt-panel"><span>Granola</span></label>
+          <label class="chip"><input type="checkbox" value="Yogurt" data-reveals="bf-yogurt-panel"><span>Yogurt</span></label>
+        </div>
+
+        <div class="sub-panel" id="bf-yogurt-panel">
+          <label class="field-label" style="margin-top:0;">Want to add to it?</label>
+          <div class="choice-grid" data-group="bf-mixin">
+            <label class="chip"><input type="checkbox" value="Cantaloupe"><span>Cantaloupe</span></label>
+            <label class="chip"><input type="checkbox" value="Strawberries"><span>Strawberries</span></label>
+            <label class="chip"><input type="checkbox" value="Blueberries"><span>Blueberries</span></label>
+            <label class="chip"><input type="checkbox" value="Granola"><span>Granola</span></label>
+            <label class="chip"><input type="checkbox" value="Yogurt"><span>Yogurt</span></label>
+          </div>
+          <input type="text" id="bf-mixin-other" placeholder="Something else…" style="margin-top:8px;">
+        </div>
+
+        <label class="field-label">Main</label>
+        <div class="choice-grid" data-group="bf-main">
+          <label class="chip"><input type="checkbox" value="French toast"><span>French toast</span></label>
+          <label class="chip"><input type="checkbox" value="Pancakes"><span>Pancakes</span></label>
+          <label class="chip"><input type="checkbox" value="Bacon"><span>Bacon</span></label>
+          <label class="chip"><input type="checkbox" value="Sausage"><span>Sausage</span></label>
+          <label class="chip"><input type="checkbox" value="Scrambled cheese eggs"><span>Scrambled cheese eggs</span></label>
+          <label class="chip"><input type="checkbox" value="Fried Egg, Over-Murdered"><span>Fried Egg, Over-Murdered</span></label>
+        </div>
+
+        <div class="lock-action-row">
+          <span class="lock-note">Set breakfast whenever you're ready.</span>
+          <button class="lock-btn" data-lock="breakfast">Set Plan</button>
+        </div>
+        <div class="send-ping" data-ping="breakfast"></div>
+      </div>
+    </div>
+
+    <!-- BEACH READING -->
+    <div class="card" data-card data-section="reading">
+      <div class="card-head" data-toggle>
+        <div class="head-left"><span class="icon">📖</span><h3>Beach reading, alone</h3></div>
+        <div class="head-right"><span class="status-pill" data-status="reading">not set</span><span class="chev">⌄</span></div>
+      </div>
+      <div class="card-body">
+        <div class="hint">Low tide is 9:52am. Reading alone on the beach works great any time before noon. You'll have a Shibumi set up and ready to go at Newport.</div>
+        <label class="field-label">What time are you heading down?</label>
+        <input type="time" id="read-time" value="09:52">
+        <label class="lock-row" style="margin-top:16px;">
+          <div class="toggle" data-toggle-switch id="read-lock"><div class="knob"></div></div>
+          <span style="font-weight:700; font-size:.95rem;">No time limit — don't come get me</span>
+        </label>
+        <div class="lock-action-row">
+          <span class="lock-note">Set it now — or change it later, no pressure.</span>
+          <button class="lock-btn" data-lock="reading">Set Plan</button>
+        </div>
+        <div class="send-ping" data-ping="reading"></div>
+      </div>
+    </div>
+
+    <!-- LUNCH -->
+    <div class="card" data-card data-section="lunch">
+      <div class="card-head" data-toggle>
+        <div class="head-left"><span class="icon">🥪</span><h3>Lunch</h3></div>
+        <div class="head-right"><span class="status-pill" data-status="lunch">not set</span><span class="chev">⌄</span></div>
+      </div>
+      <div class="card-body">
+        <label class="field-label">What time?</label>
+        <input type="time" id="lunch-time" value="12:30">
+
+        <label class="field-label">At home, or out?</label>
+        <div class="choice-grid">
+          <label class="chip radio"><input type="radio" name="lunch-where" value="home" checked><span>At home</span></label>
+          <label class="chip radio"><input type="radio" name="lunch-where" value="out"><span>Out to eat</span></label>
+        </div>
+
+        <div id="lunch-home-panel">
+          <label class="field-label">Bread</label>
+          <div class="choice-grid">
+            <label class="chip radio"><input type="radio" name="lunch-bread" value="Everything Bagel"><span>Everything Bagel</span></label>
+            <label class="chip radio"><input type="radio" name="lunch-bread" value="Dave's Killer Bread 12 grain"><span>Dave's Killer 12-grain</span></label>
+            <label class="chip radio"><input type="radio" name="lunch-bread" value="Brioche"><span>Brioche</span></label>
+            <label class="chip radio"><input type="radio" name="lunch-bread" value="Whole wheat"><span>Whole wheat</span></label>
+            <label class="chip radio"><input type="radio" name="lunch-bread" value="Oatmeal bread"><span>Oatmeal bread</span></label>
+          </div>
+          <p style="font-size:.85rem; opacity:.6; margin:10px 0 0;">or skip the bread —</p>
+          <div class="choice-grid" style="margin-top:6px;">
+            <label class="chip radio"><input type="radio" name="lunch-bread" value="Publix fried chicken instead"><span>Publix fried chicken instead</span></label>
+          </div>
+
+          <label class="field-label">Toppings</label>
+          <div class="choice-grid" data-group="lunch-toppings">
+            <label class="chip"><input type="checkbox" value="Turkey"><span>Turkey</span></label>
+            <label class="chip"><input type="checkbox" value="Roast beef"><span>Roast beef</span></label>
+            <label class="chip"><input type="checkbox" value="Ham"><span>Ham</span></label>
+            <label class="chip"><input type="checkbox" value="Muenster"><span>Muenster</span></label>
+            <label class="chip"><input type="checkbox" value="Colby jack"><span>Colby jack</span></label>
+            <label class="chip"><input type="checkbox" value="Cheddar"><span>Cheddar</span></label>
+            <label class="chip"><input type="checkbox" value="Pimento cheese"><span>Pimento cheese</span></label>
+            <label class="chip"><input type="checkbox" value="Avocado"><span>Avocado</span></label>
+            <label class="chip"><input type="checkbox" value="Lettuce"><span>Lettuce</span></label>
+            <label class="chip"><input type="checkbox" value="Tomato"><span>Tomato</span></label>
+            <label class="chip"><input type="checkbox" value="Salt"><span>Salt</span></label>
+            <label class="chip"><input type="checkbox" value="Pepper"><span>Pepper</span></label>
+          </div>
+
+          <label class="field-label">Side — chips</label>
+          <input type="text" id="lunch-chips" placeholder="What kind?">
+
+          <label class="field-label">Dessert</label>
+          <div class="choice-grid">
+            <label class="chip"><input type="checkbox" id="lunch-dessert" value="Coconut cake"><span>Coconut cake</span></label>
+          </div>
+        </div>
+
+        <div id="lunch-out-panel" style="display:none;">
+          <label class="field-label">Where?</label>
+          <div class="choice-grid">
+            <label class="chip radio"><input type="radio" name="lunch-out-where" value="Provision Company, Holden Beach"><span>Provision Company (Holden Beach)</span></label>
+            <label class="chip radio"><input type="radio" name="lunch-out-where" value="Purple Onion, Shallotte"><span>Purple Onion (Shallotte)</span></label>
+          </div>
+        </div>
+
+        <div class="lock-action-row">
+          <span class="lock-note">Set it now — or change it later, no pressure.</span>
+          <button class="lock-btn" data-lock="lunch">Set Plan</button>
+        </div>
+        <div class="send-ping" data-ping="lunch"></div>
+      </div>
+    </div>
+
+    <!-- SWIM -->
+    <div class="card" data-card data-section="swim">
+      <div class="card-head" data-toggle>
+        <div class="head-left"><span class="icon">🌊</span><h3>Swim in the canal</h3></div>
+        <div class="head-right"><span class="status-pill" data-status="swim">not set</span><span class="chev">⌄</span></div>
+      </div>
+      <div class="card-body">
+        <div class="hint">High tide is 4:07pm. The swim window is 2:15pm - 6:15pm. When would you like to swim?</div>
+        <label class="field-label">What time is everyone going in?</label>
+        <input type="time" id="swim-time" min="14:15" max="18:15" value="16:00">
+        <div class="warn" id="swim-warn">That's outside the shell-and-mud-free window (2:15–6:15pm) — still your call, just a heads up.</div>
+
+        <label class="lock-row" style="margin-top:16px;">
+          <div class="toggle" data-toggle-switch id="swim-invite-adults"><div class="knob"></div></div>
+          <span style="font-weight:700; font-size:.95rem;">Invite Bill, Carolyn, and adult family</span>
+        </label>
+        <label class="lock-row" style="margin-top:10px;">
+          <div class="toggle" data-toggle-switch id="swim-invite-kids"><div class="knob"></div></div>
+          <span style="font-weight:700; font-size:.95rem;">Invite Lovett, Sandy, and Ellen</span>
+        </label>
+
+        <div class="lock-action-row">
+          <span class="lock-note">Set it now — or change it later, no pressure.</span>
+          <button class="lock-btn" data-lock="swim">Set Plan</button>
+        </div>
+        <div class="send-ping" data-ping="swim"></div>
+      </div>
+    </div>
+
+    <!-- SHOWER -->
+    <div class="card" data-card data-section="shower">
+      <div class="card-head" data-toggle>
+        <div class="head-left"><span class="icon">🚿</span><h3>Outside shower</h3></div>
+        <div class="head-right"><span class="status-pill" data-status="shower">not set</span><span class="chev">⌄</span></div>
+      </div>
+      <div class="card-body">
+        <label class="field-label">What time?</label>
+        <input type="time" id="shower-time" value="18:30">
+        <label class="lock-row" style="margin-top:16px;">
+          <div class="toggle" data-toggle-switch id="shower-lock"><div class="knob"></div></div>
+          <span style="font-weight:700; font-size:.95rem;">No kids, no clock</span>
+        </label>
+        <div class="lock-action-row">
+          <span class="lock-note">Set it now — or change it later, no pressure.</span>
+          <button class="lock-btn" data-lock="shower">Set Plan</button>
+        </div>
+        <div class="send-ping" data-ping="shower"></div>
+      </div>
+    </div>
+
+    <!-- DINNER -->
+    <div class="card" data-card data-section="dinner">
+      <div class="card-head" data-toggle>
+        <div class="head-left"><span class="icon">🍽️</span><h3>Dinner</h3></div>
+        <div class="head-right"><span class="status-pill" data-status="dinner">not set</span><span class="chev">⌄</span></div>
+      </div>
+      <div class="card-body">
+        <label class="field-label">What time?</label>
+        <input type="time" id="dinner-time" value="19:30">
+
+        <label class="field-label">Out, or in?</label>
+        <div class="choice-grid">
+          <label class="chip radio"><input type="radio" name="dinner-where" value="out" checked><span>Out to eat</span></label>
+          <label class="chip radio"><input type="radio" name="dinner-where" value="in"><span>Chef's tasting menu at home</span></label>
+        </div>
+
+        <div id="dinner-out-panel">
+          <label class="field-label">Where?</label>
+          <div class="choice-grid">
+            <label class="chip radio"><input type="radio" name="dinner-out-where" value="Inlet View, Ocean Isle Beach"><span>Inlet View</span></label>
+            <label class="chip radio"><input type="radio" name="dinner-out-where" value="Sharky's, Ocean Isle Beach"><span>Sharky's</span></label>
+          </div>
+        </div>
+
+        <div id="dinner-in-panel" style="display:none;">
+          <label class="field-label">Tonight's theme</label>
+          <div class="choice-grid">
+            <label class="chip radio"><input type="radio" name="dinner-theme" value="Surf (baked white fish, fried shrimp)"><span>Surf</span></label>
+            <label class="chip radio"><input type="radio" name="dinner-theme" value="Turf (steaks)"><span>Turf</span></label>
+            <label class="chip radio"><input type="radio" name="dinner-theme" value="Surf and Turf"><span>Surf & Turf</span></label>
+          </div>
+        </div>
+
+        <div class="lock-action-row">
+          <span class="lock-note">Set it now — or change it later, no pressure.</span>
+          <button class="lock-btn" data-lock="dinner">Set Plan</button>
+        </div>
+        <div class="send-ping" data-ping="dinner"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="section-label">your day, at a glance</div>
+    <div class="card" style="padding:22px 20px;">
+      <div class="timeline" id="timeline-output"></div>
+    </div>
+    <p class="note-hint">Only what's set shows up solid here — everything else stays a little faded until you decide.</p>
+  </section>
+
+  <!-- ============= LOVE NOTES ============= -->
+  <section class="block">
+    <div class="section-label">every ten minutes</div>
+    <h2 style="color:var(--ocean-deep);">One more reason</h2>
+    <div class="card">
+      <div id="note-area"></div>
+      <button class="history-toggle" id="history-toggle" style="display:none;">See what you've found so far</button>
+      <div class="history-list" id="history-list"></div>
+    </div>
+  </section>
+
+  <!-- ============= VIDEOS ============= -->
+  <section class="block">
+    <div class="section-label">from the kids</div>
+    <h2 style="color:var(--ocean-deep); margin-bottom:14px;">A little something</h2>
+    <div class="video-grid" id="video-grid"></div>
+  </section>
+
+  <footer>Happy Beach Birthday!</footer>
+</div>
+
+<button id="summon-btn" aria-label="Summon Dave">🛟</button>
+
+<div id="summon-overlay">
+  <div id="summon-panel">
+    <div id="summon-close">✕</div>
+    <h3 style="color:var(--ocean-deep); margin-bottom:6px;">Summon Dave</h3>
+    <p style="font-size:.92rem; opacity:.75; margin:0 0 14px;">Tell him what you need — this'll text him your note, plus your spot if you let it grab your location.</p>
+    <textarea id="summon-text" placeholder="What do you need?" rows="4"></textarea>
+    <button id="summon-send" class="btn" style="width:100%; margin-top:14px;">Send</button>
+    <div id="summon-status"></div>
+  </div>
+</div>
+
+<script>
+/* =====================================================
+   EDIT ME — weather. Replace with real hourly data
+   as you get closer to July 9.
+===================================================== */
+const WEATHER = {
+  temp: "92°",
+  desc: "Sunny with a few clouds. Winds SW at 15–25 mph. Great beach weather all day.",
+  humidity: "69%",
+  uv: "Extreme"
+};
+document.getElementById('wx-temp').textContent = WEATHER.temp;
+document.getElementById('wx-desc').textContent = WEATHER.desc;
+document.getElementById('wx-humidity').textContent = WEATHER.humidity;
+document.getElementById('wx-uv').textContent = WEATHER.uv;
+
+/* =====================================================
+   EDIT ME — hourly forecast. Replace/extend as you get
+   closer to July 9. iconFor() maps description text to
+   an emoji; add cases there if new descriptions show up.
+===================================================== */
+const HOURLY = [
+  { time:"7 am",  temp:"82°", desc:"Mostly Sunny", pct:"6%" },
+  { time:"8 am",  temp:"83°", desc:"Sunny",        pct:"5%" },
+  { time:"9 am",  temp:"85°", desc:"Sunny",        pct:"4%" },
+  { time:"10 am", temp:"88°", desc:"Sunny",        pct:"2%" },
+  { time:"11 am", temp:"89°", desc:"Sunny",        pct:"1%" },
+  { time:"12 pm", temp:"90°", desc:"Sunny",        pct:"2%" },
+  { time:"1 pm",  temp:"91°", desc:"Mostly Sunny", pct:"4%" },
+  { time:"2 pm",  temp:"90°", desc:"Sunny",        pct:"4%" },
+  { time:"3 pm",  temp:"89°", desc:"Mostly Sunny", pct:"8%" },
+  { time:"4 pm",  temp:"89°", desc:"Mostly Sunny", pct:"3%" },
+  { time:"5 pm",  temp:"89°", desc:"Mostly Sunny", pct:"3%" },
+  { time:"6 pm",  temp:"88°", desc:"Sunny",        pct:"4%" },
+  { time:"7 pm",  temp:"88°", desc:"Sunny",        pct:"4%" },
+];
+function iconFor(desc){
+  if(desc === "Sunny") return "☀️";
+  if(desc === "Mostly Sunny") return "🌤️";
+  if(desc.includes("Cloud")) return "⛅";
+  if(desc.includes("Rain")) return "🌧️";
+  return "☀️";
+}
+document.getElementById('hourly-strip').innerHTML = HOURLY.map(h => `
+  <div class="hour-item">
+    <div class="hr-time">${h.time}</div>
+    <div class="hr-icon">${iconFor(h.desc)}</div>
+    <div class="hr-temp">${h.temp}</div>
+    <div class="hr-pct">${h.pct}</div>
+  </div>
+`).join('');
+
+/* =====================================================
+   EDIT ME — horoscope. Paraphrased from her weekly
+   horoscope (Elle Magazine, week of July 6–12) rather
+   than reproduced verbatim — copyright reasons. Swap in
+   fresh content for future weeks/years as wanted.
+===================================================== */
+const HOROSCOPE_PREVIEW = "You've earned a breather this week — then some real togetherness once your birthday rolls around.";
+const HOROSCOPE_TEXT = "You deserve a breather this week, Cancer — no need to force momentum through everything in your path. Early on, a clash between Saturn and the Sun could bring pushback from someone in authority; rather than push through it, better to hear their objections and get some outside perspective, since real resolution won't land until Mercury goes direct on the 23rd. Take the pause it hands you. From July 7, Neptune turns retrograde in your career sector for about five months — a stretch better suited to reflection than strategy. Then, starting July 9 — your birthday — Venus moves into your local/community sector through August 6, turning your attention toward home turf and the people in it. Make time to socialize as a couple this season — spontaneous outings nearby, livelier conversation, maybe even hosting your closest friends. A good stretch to slow down and lean into each other.";
+document.getElementById('horoscope-preview').textContent = HOROSCOPE_PREVIEW;
+document.getElementById('horoscope-text').textContent = HOROSCOPE_TEXT;
+
+/* =====================================================
+   Love notes — unattributed, revealed one at a time.
+   She taps to reveal; then a countdown runs until the
+   next one is available. Add more any time.
+===================================================== */
+const LOVE_NOTES = [
+  "Watching Welcome to Plathville on the couch after the kids are in bed — some of the most fun two married people have ever had. Amazing.",
+  "Our kids can swim because you decided they should learn, you kept them in lessons, and you reserved lanes and went with them so many times. That's a gift you've given them, and it took real effort. They haven't thanked you for that, probably, but I will. Thank you.",
+  "How can you listen so long to Lovett describe his passion for the Legend of Zelda? Tears of the Kingdom … you should be crying tears of the boredom. The one time I tried to join you for that, I died, was reborn, aged 44 new years, and woke up in the exact same torture chamber. There are times when your patience and love for them is so impressive.",
+  "I'm never more proud of you than when you're excited about creating something. A drawing you're working on or a painting with Ellen; your business or a new project idea; a process art class with Shenandoah. You have creativity plus momentum, and it means you're a force.",
+  "There's a mood you get in — let's call it mischievous Molly — where you have this sort of half-smirk and you don't move your head, but you mess with something with your hands really fast like a cat, or you say something funny. It's top three Molly moods, for sure, 10/10.",
+  "I'm proud of you for riding horses and finding a community at the barn. Something I never would've guessed. Big animals are scary, and so are new things. Good for you for learning how to ride!",
+  "Ellen wearing a dress and gloves and doing \"princess school\" is just the latest version of our kids wanting to dress up and have fun, to try on a new idea and pretend, but with better raw materials than we had as kids. I love that you don't think silliness is silly.",
+  "Your ass doesn't quit and neither do you.",
+  "When I ask your advice about my work, you see things clearly and give excellent advice. You can see the players and the problem, and you usually warp straight to the right frame. You're an excellent strategist.",
+  "I love how you convert new people to your cause. Aimee is a recent example, but there are lots more, people who've bought into your vision and want to work with you. You're persuasive, idealistic, and a leader. Please don't start a cult.",
+  "You can flat out wear clothes. I can't think of a time you didn't look great — dressed up or dressed down.",
+  "You'd make one of our kids three different dinners if they asked. Just because they asked.",
+  "We're sitting on a photo and video archive of our family that will take our kids months to fully explore when they grow up. Think of our kids and their kids, how much joy they'll find looking back through a thorough record of their early years. You built that almost singlehandedly.",
+  "You bought NVIDIA at $2.35. It's now $197.",
+  "Sometimes I go into the closet under the stairs and it's been reorganized. God bless you, because that place is one of the circles of hell when it's messy.",
+  "Fried rice and ham rolls! Amazing.",
+  "I love that you're a convener for your family, looking for ways to get cousins together, spending time with your relatives on the phone when they need to talk.",
+  "You parent our kids differently because they need different things. Lovett and Sandy get grouped together a lot, but you can tell when one needs to run and the other needs to read. You let them be themselves, and you notice when they're not vibrating at the same frequency.",
+  "I like how much you like to read.",
+  "I love your politics. If you were Trumpy, I wouldn't be writing this because we wouldn't be together. So thank you for seeing the world like I do!",
+  "I secretly like that you're into crystals and horoscopes. It's interesting and I like learning about it! I will deny this if you ask me about it.",
+  "Whoopi Goldberg appreciates that you celebrate her filmography. I am neutral on the matter.",
+  "You're the most flexible person I know.",
+  "Your hair half back and you wearing glasses. Good lord.",
+  "I love that you have a near-complete knowledge of 90s country AND 90s hip-hop. A lot of my working life, I'm around ex-prep school kids who want to talk about The National and other bullshit like that, but they can't sing all the lyrics to Lesson in Leavin' by Jo Dee Messina and I don't understand that.",
+  "I like that you make your friends' friends into your friends.",
+  "I know it's been a long road with your hormones and headaches. You've become a good self-advocate, and you've been persistent. You deserve a big time win with your health soon, but I legitimately admire how tenacious you've been, how you're always working the problem."
+];
+const NOTE_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
+const FINAL_MESSAGE = "Check back later for more reasons we love you.";
+
+/* =====================================================
+   EDIT ME — kids' videos. Paste YouTube video IDs
+   (works for regular videos and Shorts alike). Leave
+   "" for a placeholder card until you have the clip.
+===================================================== */
+const VIDEOS = [
+  { who: "Lovett", id: "KnBcZC42eMI" },
+  { who: "Sandy", id: "ZcC5VbuFGfY" },
+  { who: "Ellen", id: "" },
+];
+
+/* =====================================================
+   EDIT ME — where set/updated sections get sent. Create
+   a free form at https://formspree.io, drop the
+   endpoint here. Every set/update posts just that
+   one section — nothing gets bundled or cemented.
+===================================================== */
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/xrewvkaw";
+
+const SECTION_LABELS = {
+  breakfast: 'Breakfast', reading: 'Beach reading', lunch: 'Lunch',
+  swim: 'Canal swim', shower: 'Outside shower', dinner: 'Dinner'
+};
+const SECTION_ORDER = ['breakfast','reading','lunch','swim','shower','dinner'];
+
+/* ---------------- Sun arc scroll ---------------- */
+const sunArcPath = document.getElementById('sun-arc-path');
+const sunDot = document.getElementById('sun-dot');
+const sunLabel = document.getElementById('sun-time-label');
+function layoutArc(){
+  const w = window.innerWidth, h = window.innerHeight;
+  const path = `M ${w*0.15} ${h*0.12} Q ${w*0.5} ${-h*0.05} ${w*0.85} ${h*0.12}`;
+  sunArcPath.setAttribute('d', path);
+}
+function pointOnArc(t){
+  const w = window.innerWidth, h = window.innerHeight;
+  const p0 = {x:w*0.15, y:h*0.12}, p1 = {x:w*0.5, y:-h*0.05}, p2 = {x:w*0.85, y:h*0.12};
+  const x = (1-t)*(1-t)*p0.x + 2*(1-t)*t*p1.x + t*t*p2.x;
+  const y = (1-t)*(1-t)*p0.y + 2*(1-t)*t*p1.y + t*t*p2.y;
+  return {x,y};
+}
+function minutesToLabel(mins){
+  let h = Math.floor(mins/60), m = Math.round(mins%60);
+  const ap = h >= 12 ? 'pm' : 'am';
+  let h12 = h % 12; if(h12===0) h12=12;
+  return `${h12}:${m.toString().padStart(2,'0')}${ap}`;
+}
+function updateSun(){
+  const doc = document.documentElement;
+  const scrollable = doc.scrollHeight - window.innerHeight;
+  const t = scrollable > 0 ? Math.min(1, window.scrollY / scrollable) : 0;
+  const pos = pointOnArc(t);
+  sunDot.style.left = (pos.x - 23) + 'px';
+  sunDot.style.top = (pos.y - 23 + 40) + 'px';
+  const startMin = 6*60+10, endMin = 20*60+27;
+  sunLabel.textContent = minutesToLabel(startMin + t*(endMin-startMin));
+}
+layoutArc();
+updateSun();
+window.addEventListener('resize', ()=>{ layoutArc(); updateSun(); });
+window.addEventListener('scroll', updateSun, {passive:true});
+
+/* ---------------- Card open/close ---------------- */
+document.querySelectorAll('[data-toggle]').forEach(head=>{
+  head.addEventListener('click', ()=>{
+    const card = head.closest('[data-card]');
+    const body = card.querySelector('.card-body');
+    const wasOpen = card.classList.contains('open');
+    card.classList.toggle('open');
+    body.style.maxHeight = wasOpen ? '0px' : body.scrollHeight + 'px';
+  });
+});
+function refreshOpenCardHeight(el){
+  const card = el.closest('[data-card]');
+  if(card && card.classList.contains('open')){
+    const body = card.querySelector('.card-body');
+    body.style.maxHeight = body.scrollHeight + 'px';
+  }
+}
+
+/* ---------------- Reveal panels (granola/yogurt) ---------------- */
+document.querySelectorAll('[data-reveals]').forEach(box=>{
+  box.addEventListener('change', ()=>{
+    const groupName = box.closest('[data-group]').dataset.group;
+    const anyChecked = document.querySelectorAll(`[data-group="${groupName}"] [data-reveals]:checked`).length > 0;
+    document.getElementById(box.dataset.reveals).classList.toggle('show', anyChecked);
+    refreshOpenCardHeight(box);
+  });
+});
+
+/* ---------------- Toggles (no-time-limit switches) ---------------- */
+document.querySelectorAll('[data-toggle-switch]').forEach(t=>{
+  t.addEventListener('click', ()=> t.classList.toggle('on'));
+});
+
+/* ---------------- Lunch home/out, dinner out/in ---------------- */
+document.querySelectorAll('input[name="lunch-where"]').forEach(r=>{
+  r.addEventListener('change', ()=>{
+    const isHome = document.querySelector('input[name="lunch-where"]:checked').value === 'home';
+    document.getElementById('lunch-home-panel').style.display = isHome ? 'block':'none';
+    document.getElementById('lunch-out-panel').style.display = isHome ? 'none':'block';
+    refreshOpenCardHeight(r);
+  });
+});
+document.querySelectorAll('input[name="dinner-where"]').forEach(r=>{
+  r.addEventListener('change', ()=>{
+    const isOut = document.querySelector('input[name="dinner-where"]:checked').value === 'out';
+    document.getElementById('dinner-out-panel').style.display = isOut ? 'block':'none';
+    document.getElementById('dinner-in-panel').style.display = isOut ? 'none':'block';
+    refreshOpenCardHeight(r);
+  });
+});
+
+/* ---------------- Swim window warning ---------------- */
+const swimInput = document.getElementById('swim-time');
+function checkSwimWindow(){
+  const [h,m] = swimInput.value.split(':').map(Number);
+  const mins = h*60+m;
+  const outside = mins < (14*60+15) || mins > (18*60+15);
+  document.getElementById('swim-warn').classList.toggle('show', outside);
+  refreshOpenCardHeight(swimInput);
+}
+swimInput.addEventListener('change', checkSwimWindow);
+
+/* ---------------- Generic field helpers ---------------- */
+function val(id){ const el = document.getElementById(id); return el ? el.value : ''; }
+function setVal(id, v){ const el = document.getElementById(id); if(el && v !== undefined) el.value = v; }
+function getChecked(group){ return Array.from(document.querySelectorAll(`[data-group="${group}"] input:checked`)).map(i=>i.value); }
+function setChecked(group, arr){ arr = arr || []; document.querySelectorAll(`[data-group="${group}"] input`).forEach(i=>{ i.checked = arr.includes(i.value); }); }
+function radioVal(name){ const r = document.querySelector(`input[name="${name}"]:checked`); return r ? r.value : ''; }
+function setRadio(name, v){ if(!v) return; document.querySelectorAll(`input[name="${name}"]`).forEach(i=>{ i.checked = (i.value === v); }); }
+function isOn(id){ return document.getElementById(id).classList.contains('on'); }
+function setOn(id, bool){ document.getElementById(id).classList.toggle('on', !!bool); }
+function fmt(t){ if(!t) return ''; const [h,m] = t.split(':').map(Number); return minutesToLabel(h*60+m); }
+
+/* ---------------- Per-section read/write ---------------- */
+function readSection(section){
+  switch(section){
+    case 'breakfast': return {
+      time: val('bf-time'), drinks: getChecked('bf-drink'), sides: getChecked('bf-side'),
+      mixins: getChecked('bf-mixin'), mixinOther: val('bf-mixin-other'), main: getChecked('bf-main')
+    };
+    case 'reading': return { time: val('read-time'), noTimeLimit: isOn('read-lock') };
+    case 'lunch': {
+      const where = radioVal('lunch-where');
+      const d = { time: val('lunch-time'), where };
+      if(where === 'home'){
+        d.bread = radioVal('lunch-bread'); d.toppings = getChecked('lunch-toppings');
+        d.chips = val('lunch-chips'); d.dessert = document.getElementById('lunch-dessert').checked;
+      } else { d.restaurant = radioVal('lunch-out-where'); }
+      return d;
+    }
+    case 'swim': return { time: val('swim-time'), inviteAdults: isOn('swim-invite-adults'), inviteKids: isOn('swim-invite-kids') };
+    case 'shower': return { time: val('shower-time'), protectedTime: isOn('shower-lock') };
+    case 'dinner': {
+      const where = radioVal('dinner-where');
+      const d = { time: val('dinner-time'), where };
+      if(where === 'out'){ d.restaurant = radioVal('dinner-out-where'); }
+      else { d.theme = radioVal('dinner-theme'); }
+      return d;
+    }
+  }
+}
+function writeSection(section, d){
+  if(!d) return;
+  switch(section){
+    case 'breakfast':
+      setVal('bf-time', d.time); setChecked('bf-drink', d.drinks); setChecked('bf-side', d.sides);
+      setChecked('bf-mixin', d.mixins); setVal('bf-mixin-other', d.mixinOther); setChecked('bf-main', d.main);
+      document.getElementById('bf-yogurt-panel').classList.toggle('show', (d.sides||[]).some(s=>['Granola','Yogurt'].includes(s)));
+      break;
+    case 'reading': setVal('read-time', d.time); setOn('read-lock', d.noTimeLimit); break;
+    case 'lunch':
+      setVal('lunch-time', d.time); setRadio('lunch-where', d.where);
+      document.getElementById('lunch-home-panel').style.display = d.where === 'home' ? 'block' : 'none';
+      document.getElementById('lunch-out-panel').style.display = d.where === 'home' ? 'none' : 'block';
+      if(d.where === 'home'){
+        setRadio('lunch-bread', d.bread); setChecked('lunch-toppings', d.toppings);
+        setVal('lunch-chips', d.chips); document.getElementById('lunch-dessert').checked = !!d.dessert;
+      } else { setRadio('lunch-out-where', d.restaurant); }
+      break;
+    case 'swim': setVal('swim-time', d.time); setOn('swim-invite-adults', d.inviteAdults); setOn('swim-invite-kids', d.inviteKids); checkSwimWindow(); break;
+    case 'shower': setVal('shower-time', d.time); setOn('shower-lock', d.protectedTime); break;
+    case 'dinner':
+      setVal('dinner-time', d.time); setRadio('dinner-where', d.where);
+      document.getElementById('dinner-out-panel').style.display = d.where === 'out' ? 'block' : 'none';
+      document.getElementById('dinner-in-panel').style.display = d.where === 'out' ? 'none' : 'block';
+      if(d.where === 'out'){ setRadio('dinner-out-where', d.restaurant); } else { setRadio('dinner-theme', d.theme); }
+      break;
+  }
+}
+function summaryLine(section, d){
+  switch(section){
+    case 'breakfast': return [...(d.main||[]), ...(d.drinks||[])].join(', ') || 'set';
+    case 'reading': return d.noTimeLimit ? 'no time limit' : 'flexible';
+    case 'lunch': return d.where === 'home' ? (d.bread || 'menu set') : (d.restaurant || 'restaurant set');
+    case 'swim': {
+      const who = [];
+      if(d.inviteAdults) who.push('Bill, Carolyn & adult family');
+      if(d.inviteKids) who.push('Lovett, Sandy & Ellen');
+      return who.length ? who.join(' + ') : 'just the two of you';
+    }
+    case 'shower': return d.protectedTime ? 'no kids, no clock' : 'set';
+    case 'dinner': return d.where === 'out' ? (d.restaurant || 'restaurant set') : (d.theme || 'tasting menu set');
+  }
+}
+
+/* ---------------- Persistent, per-section state ---------------- */
+const STORE_KEY = 'molly-birthday-plan-v2';
+function loadStore(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); }catch(e){ return {}; } }
+function saveStore(store){ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
+let store = loadStore();
+
+function statusPill(section){ return document.querySelector(`[data-status="${section}"]`); }
+function lockBtn(section){ return document.querySelector(`[data-lock="${section}"]`); }
+function pingEl(section){ return document.querySelector(`[data-ping="${section}"]`); }
+
+function refreshStatusUI(section){
+  const entry = store[section];
+  const pill = statusPill(section);
+  const btn = lockBtn(section);
+  if(!entry || !entry.locked){
+    pill.textContent = 'not set'; pill.className = 'status-pill';
+    btn.textContent = 'Set Plan'; btn.className = 'lock-btn';
+    return;
+  }
+  if(entry.dirty){
+    pill.textContent = 'adjusted'; pill.className = 'status-pill dirty';
+    btn.textContent = 'Send update'; btn.className = 'lock-btn dirty-state';
+  } else {
+    pill.textContent = `set · ${fmt(entry.data.time)}`; pill.className = 'status-pill locked';
+    btn.textContent = 'Update'; btn.className = 'lock-btn locked-state';
+  }
+}
+
+SECTION_ORDER.forEach(section=>{
+  const entry = store[section];
+  if(entry && entry.data){ writeSection(section, entry.data); }
+  refreshStatusUI(section);
+});
+
+document.querySelectorAll('[data-card]').forEach(card=>{
+  const section = card.dataset.section;
+  card.addEventListener('input', ()=>{
+    if(store[section] && store[section].locked){ store[section].dirty = true; saveStore(store); refreshStatusUI(section); }
+    renderTimeline();
+  });
+  card.addEventListener('change', ()=>{
+    if(store[section] && store[section].locked){ store[section].dirty = true; saveStore(store); refreshStatusUI(section); }
+    renderTimeline();
+  });
+});
+
+document.querySelectorAll('[data-lock]').forEach(btn=>{
+  btn.addEventListener('click', async ()=>{
+    const section = btn.dataset.lock;
+    const data = readSection(section);
+    const wasAlreadyLocked = !!(store[section] && store[section].locked);
+    store[section] = { locked:true, dirty:false, lockedAt: Date.now(), data };
+    saveStore(store);
+    refreshStatusUI(section);
+    renderTimeline();
+
+    const ping = pingEl(section);
+    ping.textContent = 'Sending…';
+    try{
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method:'POST',
+        headers:{'Content-Type':'application/json','Accept':'application/json'},
+        body: JSON.stringify({
+          source: "Molly's birthday site",
+          section: SECTION_LABELS[section],
+          action: wasAlreadyLocked ? 'updated' : 'set',
+          details: JSON.stringify(data, null, 2)
+        })
+      });
+      ping.textContent = res.ok ? `${SECTION_LABELS[section]} sent ✓` : "Set here, but couldn't reach the inbox — try again.";
+    }catch(e){
+      ping.textContent = "Set here, but couldn't reach the inbox — try again.";
+    }
+    setTimeout(()=>{ ping.textContent = ''; }, 4000);
+  });
+});
+
+/* ---------------- Timeline: set items solid, rest faded/pending ---------------- */
+function renderTimeline(){
+  const items = SECTION_ORDER.map(section=>{
+    const entry = store[section];
+    if(entry && entry.locked){
+      return { time: entry.data.time, label: SECTION_LABELS[section], detail: summaryLine(section, entry.data), pending:false };
+    }
+    const live = readSection(section);
+    return { time: live.time, label: SECTION_LABELS[section], detail: 'not decided yet', pending:true };
+  }).filter(i=>i.time).sort((a,b)=> a.time.localeCompare(b.time));
+
+  const el = document.getElementById('timeline-output');
+  if(items.length === 0){
+    el.innerHTML = `<div class="t-item pending"><div class="t-time">—</div><div class="t-desc">Set a piece of the day above and it'll show up here.</div></div>`;
+    return;
+  }
+  el.innerHTML = items.map(i => `
+    <div class="t-item ${i.pending ? 'pending':''}">
+      <div class="t-time">${fmt(i.time)} — ${i.label}</div>
+      <div class="t-desc">${i.detail}</div>
+    </div>
+  `).join('');
+}
+renderTimeline();
+
+/* ---------------- Love notes: click-to-reveal + history ---------------- */
+(function(){
+  const STORAGE_KEY = 'molly-birthday-notes-v2';
+  let state = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+  if(!state){ state = { revealedCount: 0, lastRevealAt: null }; localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+  const area = document.getElementById('note-area');
+  const historyToggle = document.getElementById('history-toggle');
+  const historyList = document.getElementById('history-list');
+
+  function renderHistory(){
+    if(state.revealedCount === 0){ historyToggle.style.display = 'none'; return; }
+    historyToggle.style.display = 'block';
+    historyToggle.textContent = historyToggle.classList.contains('open')
+      ? `Hide what you've found (${state.revealedCount})`
+      : `See what you've found so far (${state.revealedCount})`;
+    historyList.innerHTML = LOVE_NOTES.slice(0, state.revealedCount).slice().reverse()
+      .map(n => `<div class="history-item">"${n}"</div>`).join('');
+  }
+
+  function render(){
+    const total = LOVE_NOTES.length;
+    const lastNote = state.revealedCount > 0 ? LOVE_NOTES[state.revealedCount - 1] : null;
+
+    if(state.revealedCount === 0){
+      area.innerHTML = `<div class="note-card"><button class="reveal-btn" id="reveal-btn">Reveal a reason we love you</button></div>`;
+    } else if(state.revealedCount >= total){
+      area.innerHTML = `<div class="note-card"><div class="note-text">"${lastNote}"</div><div class="note-count">${FINAL_MESSAGE}</div></div>`;
+    } else {
+      const elapsed = Date.now() - state.lastRevealAt;
+      if(elapsed >= NOTE_INTERVAL_MS){
+        area.innerHTML = `<div class="note-card"><div class="note-text">"${lastNote}"</div><div class="note-count" style="margin-bottom:14px;">${state.revealedCount} of ${total} found</div><button class="reveal-btn" id="reveal-btn">Reveal the next one</button></div>`;
+      } else {
+        const mins = Math.max(1, Math.ceil((NOTE_INTERVAL_MS - elapsed) / 60000));
+        area.innerHTML = `<div class="note-card"><div class="note-text">"${lastNote}"</div><div class="note-count">${state.revealedCount} of ${total} · next one in ${mins} min</div></div>`;
+      }
+    }
+
+    const btn = document.getElementById('reveal-btn');
+    if(btn){
+      btn.addEventListener('click', ()=>{
+        state.revealedCount += 1;
+        state.lastRevealAt = Date.now();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        render();
+        renderHistory();
+      });
+    }
+    renderHistory();
+  }
+
+  historyToggle.addEventListener('click', ()=>{
+    historyToggle.classList.toggle('open');
+    historyList.classList.toggle('show');
+    renderHistory();
+  });
+
+  render();
+  setInterval(render, 15000);
+})();
+
+/* ---------------- Videos ---------------- */
+(function(){
+  const grid = document.getElementById('video-grid');
+  grid.innerHTML = VIDEOS.map(v => `
+    <div class="video-slot">
+      <div class="who">${v.who}</div>
+      <div class="video-frame">
+        ${ v.id
+          ? `<iframe src="https://www.youtube-nocookie.com/embed/${v.id}?playsinline=1&rel=0" title="${v.who}" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+          : `<div class="video-placeholder">coming soon 🎬</div>` }
+      </div>
+      ${ v.id ? `<a class="video-fallback" href="https://youtube.com/shorts/${v.id}" target="_blank" rel="noopener">Trouble playing? Watch on YouTube →</a>` : '' }
+    </div>
+  `).join('');
+})();
+
+/* ---------------- One-time "Add to Home Screen" nudge ---------------- */
+(function(){
+  const KEY = 'molly-birthday-onboarded-v1';
+  const banner = document.getElementById('onboarding-banner');
+  const dismissBtn = document.getElementById('onboarding-dismiss');
+  if(!localStorage.getItem(KEY)){
+    setTimeout(()=> banner.classList.add('show'), 600);
+  }
+  dismissBtn.addEventListener('click', ()=>{
+    localStorage.setItem(KEY, '1');
+    banner.classList.remove('show');
+  });
+})();
+
+/* ---------------- Summon Dave ---------------- */
+/* =====================================================
+   EDIT ME — your number, digits only with country code,
+   e.g. "+19105551234". This gets embedded in the site's
+   code, which is public once pushed to GitHub Pages.
+===================================================== */
+const DAVE_PHONE = "+17045640046";
+
+(function(){
+  const btn = document.getElementById('summon-btn');
+  const overlay = document.getElementById('summon-overlay');
+  const closeBtn = document.getElementById('summon-close');
+  const textArea = document.getElementById('summon-text');
+  const sendBtn = document.getElementById('summon-send');
+  const status = document.getElementById('summon-status');
+
+  function open(){ overlay.classList.add('show'); status.textContent=''; textArea.focus(); }
+  function close(){ overlay.classList.remove('show'); textArea.value=''; status.textContent=''; }
+
+  btn.addEventListener('click', open);
+  closeBtn.addEventListener('click', close);
+  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) close(); });
+
+  function sendWithMapsLink(message, mapsLink){
+    let body = message || "Need you.";
+    if(mapsLink) body += `\n\nMy spot: ${mapsLink}`;
+    const smsHref = `sms:${DAVE_PHONE}&body=${encodeURIComponent(body)}`;
+    window.location.href = smsHref;
+    setTimeout(close, 600);
+  }
+
+  sendBtn.addEventListener('click', ()=>{
+    const message = textArea.value.trim();
+    if(!navigator.geolocation){
+      status.textContent = "Location isn't available here — sending without it.";
+      sendWithMapsLink(message, null);
+      return;
+    }
+    status.textContent = "Finding your spot…";
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+        const { latitude, longitude } = pos.coords;
+        const mapsLink = `https://maps.google.com/?q=${latitude},${longitude}`;
+        sendWithMapsLink(message, mapsLink);
+      },
+      ()=>{
+        status.textContent = "Couldn't get your location — sending without it.";
+        sendWithMapsLink(message, null);
+      },
+      { enableHighAccuracy:true, timeout:8000 }
+    );
+  });
+})();
+
+/* ---------------- Easter egg: tap the sun / umbrella ---------------- */
+(function(){
+  let taps = 0;
+  const colors = ['#FF6F59','#FFC94D','#0F6E85','#FFFBF2'];
+  function confetti(){
+    for(let i=0;i<28;i++){
+      const p = document.createElement('div');
+      p.className='confetti-piece';
+      p.style.left = Math.random()*100 + 'vw';
+      p.style.background = colors[Math.floor(Math.random()*colors.length)];
+      p.style.transform = `rotate(${Math.random()*360}deg)`;
+      p.style.transition = `transform ${1.4+Math.random()}s ease-in, top ${1.4+Math.random()}s ease-in, opacity .3s ease ${1+Math.random()}s`;
+      document.body.appendChild(p);
+      requestAnimationFrame(()=>{
+        p.style.top = '100vh';
+        p.style.transform += ` translateX(${(Math.random()-0.5)*120}px)`;
+        p.style.opacity = '0';
+      });
+      setTimeout(()=>p.remove(), 3000);
+    }
+  }
+  function showEgg(msg){
+    const el = document.createElement('div');
+    el.className = 'egg-msg';
+    el.textContent = msg;
+    document.body.appendChild(el);
+    requestAnimationFrame(()=> el.classList.add('show'));
+    setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(), 400); }, 2600);
+  }
+  function handleTap(){
+    taps++;
+    if(taps === 3){ confetti(); showEgg("found one — happy birthday, my love 🐚"); taps = 0; }
+  }
+  sunDot.addEventListener('click', handleTap);
+  document.getElementById('umbrella-egg').addEventListener('click', handleTap);
+})();
+</script>
+</body>
+</html>
