@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Happy Birthday, Molly</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 4C7 4 3 14 3 14h26S25 4 16 4Z' fill='%23FF6F59'/%3E%3Cpath d='M3 14 16 4 16 14Z' fill='%23E5533E'/%3E%3Cpath d='M16 4 29 14 16 14Z' fill='%23FF6F59'/%3E%3Crect x='15' y='14' width='2' height='13' fill='%230B4F63'/%3E%3Cpath d='M12 27q4 4 8 0' stroke='%230B4F63' stroke-width='2.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Caveat:wght@500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
 <style>
@@ -25,6 +26,7 @@
   html{scroll-behavior:smooth;}
   body{
     margin:0;
+    padding-top:46px;
     background: linear-gradient(180deg, #CDEAF0 0%, var(--sand) 14%, var(--sand) 100%);
     color:var(--ink);
     font-family:'Nunito', sans-serif;
@@ -137,7 +139,7 @@
   .note-hint{ text-align:center; font-size:.85rem; opacity:.65; padding:14px 20px 0; }
 
   .note-card{ background: linear-gradient(160deg, var(--foam), #fff); text-align:center; padding:26px 22px; }
-  .note-text{ font-family:'Caveat', cursive; font-size:1.6rem; color:var(--ocean-deep); line-height:1.4; }
+  .note-text{ font-family:'Nunito', sans-serif; font-weight:700; font-size:1.15rem; color:var(--ocean-deep); line-height:1.5; text-align:left; }
   .note-count{ font-size:.85rem; opacity:.6; margin-top:10px; }
   .reveal-btn{
     background:var(--coral); color:#fff; border:none; padding:16px 28px; border-radius:999px;
@@ -152,7 +154,7 @@
   }
   .history-list{ display:none; padding:0 22px 20px; }
   .history-list.show{ display:block; }
-  .history-item{ padding:12px 0; border-bottom:1px dashed var(--line); font-family:'Caveat', cursive; font-size:1.25rem; color:var(--ink); }
+  .history-item{ padding:12px 0; border-bottom:1px dashed var(--line); font-family:'Nunito', sans-serif; font-weight:600; font-size:1rem; color:var(--ink); text-align:left; }
   .history-item:last-child{ border-bottom:none; }
 
   .video-grid{ display:flex; flex-direction:column; gap:16px; }
@@ -180,6 +182,14 @@
     cursor:pointer; display:flex; align-items:center; justify-content:center;
   }
   #summon-btn:active{ transform: scale(.94); }
+  #summon-tooltip{
+    display:none; position:fixed; right:16px; bottom:90px; z-index:41;
+    max-width:200px; background:var(--ocean-deep); color:#fff;
+    padding:10px 14px; border-radius:14px 14px 4px 14px;
+    font-size:.82rem; line-height:1.35; box-shadow:0 8px 20px rgba(0,0,0,0.25);
+    opacity:0; transform:translateY(8px); transition:opacity .35s ease, transform .35s ease;
+  }
+  #summon-tooltip.show{ display:block; opacity:1; transform:translateY(0); }
   #summon-overlay{
     display:none; position:fixed; inset:0; background:rgba(11,79,99,0.45);
     z-index:70; align-items:flex-end; justify-content:center;
@@ -199,6 +209,70 @@
     resize:vertical;
   }
   #summon-status{ margin-top:10px; font-size:.85rem; color:var(--ocean-deep); min-height:1.2em; }
+
+  #shell-badge{
+    position:fixed; top:14px; left:16px; z-index:41;
+    display:flex; align-items:center; gap:6px;
+    background:rgba(255,251,240,0.85); backdrop-filter: blur(3px);
+    border:1px solid var(--line); border-radius:999px; padding:6px 12px;
+    font-family:'Nunito', sans-serif; font-weight:800; font-size:.9rem; color:var(--ocean-deep);
+    cursor:pointer;
+  }
+  #shell-badge:active{ transform: scale(.95); }
+  #shell-badge.pulse{ animation: shellPulse .5s ease; }
+  @keyframes shellPulse{ 0%{ transform:scale(1); } 40%{ transform:scale(1.25); } 100%{ transform:scale(1); } }
+  .shell-toast{
+    position:fixed; top:60px; left:16px; z-index:95;
+    background:var(--coral); color:#fff; font-weight:800; font-size:.9rem;
+    padding:6px 14px; border-radius:999px; box-shadow:0 6px 16px rgba(255,111,89,0.4);
+    opacity:0; transform:translateY(6px); transition:all .35s ease; pointer-events:none;
+  }
+  .shell-toast.show{ opacity:1; transform:translateY(0); }
+
+  #shell-overlay{
+    display:none; position:fixed; inset:0; background:rgba(11,79,99,0.45);
+    z-index:71; align-items:flex-end; justify-content:center;
+  }
+  #shell-overlay.show{ display:flex; }
+  #shell-panel{
+    background:var(--foam); width:100%; max-width:480px; border-radius:24px 24px 0 0;
+    padding:24px 22px 30px; position:relative; max-height:70vh; overflow-y:auto;
+    box-shadow:0 -10px 30px rgba(0,0,0,0.2);
+  }
+  #shell-panel-close{
+    position:absolute; top:16px; right:18px; font-size:1.1rem; color:var(--ocean-deep);
+    cursor:pointer; opacity:.6;
+  }
+  #shell-grid{
+    display:grid; grid-template-columns:repeat(7, 1fr); gap:8px;
+  }
+  .shell-slot{
+    aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+    font-size:1.3rem; border-radius:10px; background:var(--sand);
+    opacity:.25; filter:grayscale(1);
+  }
+  .shell-slot.earned{ opacity:1; filter:none; background:rgba(255,111,89,0.1); }
+  #shell-watch-again{
+    display:block; width:100%; margin-top:16px; background:var(--coral); color:#fff;
+    border:none; padding:12px 18px; border-radius:999px; font-family:'Nunito', sans-serif;
+    font-weight:800; font-size:.92rem; cursor:pointer;
+  }
+  #shell-watch-again:active{ transform: scale(.97); }
+
+  #reward-overlay{
+    display:none; position:fixed; inset:0; background:rgba(11,79,99,0.6);
+    z-index:80; align-items:center; justify-content:center; padding:20px;
+  }
+  #reward-overlay.show{ display:flex; }
+  #reward-panel{
+    background:var(--foam); width:100%; max-width:420px; border-radius:24px;
+    padding:24px 22px 26px; position:relative;
+    box-shadow:0 20px 50px rgba(0,0,0,0.35);
+  }
+  #reward-close{
+    position:absolute; top:16px; right:18px; font-size:1.1rem; color:var(--ocean-deep);
+    cursor:pointer; opacity:.6;
+  }
 
   #onboarding-banner{
     position:fixed; top:0; left:0; right:0; z-index:90;
@@ -234,10 +308,36 @@
 </div>
 <div id="sun-time-label">6:10am</div>
 
+<button id="shell-badge" aria-label="Shell collection">
+  <span id="shell-badge-icon">🐚</span>
+  <span id="shell-badge-count">0</span>
+</button>
+
+<div id="shell-overlay">
+  <div id="shell-panel">
+    <div id="shell-panel-close">✕</div>
+    <h3 style="color:var(--ocean-deep); margin-bottom:4px;">Your shell collection</h3>
+    <div id="shell-panel-caption" style="font-size:.88rem; opacity:.7; margin-bottom:14px;"></div>
+    <div id="shell-grid"></div>
+    <button id="shell-watch-again" style="display:none;">🎬 Watch your reward again</button>
+  </div>
+</div>
+
+<div id="reward-overlay">
+  <div id="reward-panel">
+    <div id="reward-close">✕</div>
+    <h3 style="color:var(--ocean-deep); margin-bottom:6px;">You found every shell 🐚</h3>
+    <p style="font-size:.92rem; opacity:.75; margin:0 0 16px;">All 33. One more thing for you.</p>
+    <div class="video-frame">
+      <iframe src="https://www.youtube-nocookie.com/embed/0jw61p7Qnuk?playsinline=1&rel=0" title="For you" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+</div>
+
 <header class="hero">
   <div class="eyebrow">a whole day, just for you</div>
   <h1>Happy Birthday,<br>Molly</h1>
-  <p class="sub">Set each piece of your day as you go — and change your mind anytime. Nothing here is set in stone but what you decide it should be.</p>
+  <p class="sub">Set each piece of your day, then change them if you choose. Nothing is set in stone until you want it to be.</p>
   <svg class="umbrella" viewBox="0 0 100 100" id="umbrella-egg">
     <path d="M50 20 C25 20 10 45 10 45 L90 45 C90 45 75 20 50 20 Z" fill="#FF6F59"/>
     <path d="M10 45 L50 20 L50 45 Z" fill="#E5533E"/>
@@ -289,6 +389,14 @@
       <div class="card-body">
         <div class="horoscope-text" id="horoscope-text" style="padding-bottom:18px;"></div>
       </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="section-label">the vibes</div>
+    <h2 style="color:var(--ocean-deep); margin-bottom:14px;">Today's soundtrack</h2>
+    <div class="card" style="padding:10px; box-shadow:var(--shadow);">
+      <iframe style="border-radius:12px;" src="https://open.spotify.com/embed/playlist/4HVJWp2SFB1EqoFYrVnVuT?utm_source=generator" width="100%" height="352" frameborder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
     </div>
   </section>
 
@@ -345,6 +453,9 @@
           <label class="chip"><input type="checkbox" value="Fried Egg, Over-Murdered"><span>Fried Egg, Over-Murdered</span></label>
         </div>
 
+        <label class="field-label">Anything else?</label>
+        <input type="text" id="bf-other" placeholder="Optional notes or requests…">
+
         <div class="lock-action-row">
           <span class="lock-note">Set breakfast whenever you're ready.</span>
           <button class="lock-btn" data-lock="breakfast">Set Plan</button>
@@ -367,6 +478,8 @@
           <div class="toggle" data-toggle-switch id="read-lock"><div class="knob"></div></div>
           <span style="font-weight:700; font-size:.95rem;">No time limit — don't come get me</span>
         </label>
+        <label class="field-label">Anything else?</label>
+        <input type="text" id="read-other" placeholder="Optional notes or requests…">
         <div class="lock-action-row">
           <span class="lock-note">Set it now — or change it later, no pressure.</span>
           <button class="lock-btn" data-lock="reading">Set Plan</button>
@@ -394,7 +507,7 @@
         <div id="lunch-home-panel">
           <label class="field-label">Bread</label>
           <div class="choice-grid">
-            <label class="chip radio"><input type="radio" name="lunch-bread" value="Everything Bagel"><span>Everything Bagel</span></label>
+            <label class="chip radio"><input type="radio" name="lunch-bread" value="Bagel"><span>Bagel</span></label>
             <label class="chip radio"><input type="radio" name="lunch-bread" value="Dave's Killer Bread 12 grain"><span>Dave's Killer 12-grain</span></label>
             <label class="chip radio"><input type="radio" name="lunch-bread" value="Brioche"><span>Brioche</span></label>
             <label class="chip radio"><input type="radio" name="lunch-bread" value="Whole wheat"><span>Whole wheat</span></label>
@@ -438,6 +551,22 @@
           </div>
         </div>
 
+        <label class="lock-row" style="margin-top:16px;">
+          <div class="toggle" data-toggle-switch id="lunch-invite-adults"><div class="knob"></div></div>
+          <span style="font-weight:700; font-size:.95rem;">With Bill and Carolyn</span>
+        </label>
+        <label class="lock-row" style="margin-top:10px;">
+          <div class="toggle" data-toggle-switch id="lunch-invite-kids"><div class="knob"></div></div>
+          <span style="font-weight:700; font-size:.95rem;">With Lovett, Sandy, and Ellen</span>
+        </label>
+        <label class="lock-row" style="margin-top:10px;">
+          <div class="toggle" data-toggle-switch id="lunch-invite-dave"><div class="knob"></div></div>
+          <span style="font-weight:700; font-size:.95rem;">With Dave</span>
+        </label>
+
+        <label class="field-label">Anything else?</label>
+        <input type="text" id="lunch-other" placeholder="Optional notes or requests…">
+
         <div class="lock-action-row">
           <span class="lock-note">Set it now — or change it later, no pressure.</span>
           <button class="lock-btn" data-lock="lunch">Set Plan</button>
@@ -467,6 +596,9 @@
           <span style="font-weight:700; font-size:.95rem;">Invite Lovett, Sandy, and Ellen</span>
         </label>
 
+        <label class="field-label">Anything else?</label>
+        <input type="text" id="swim-other" placeholder="Optional notes or requests…">
+
         <div class="lock-action-row">
           <span class="lock-note">Set it now — or change it later, no pressure.</span>
           <button class="lock-btn" data-lock="swim">Set Plan</button>
@@ -488,6 +620,8 @@
           <div class="toggle" data-toggle-switch id="shower-lock"><div class="knob"></div></div>
           <span style="font-weight:700; font-size:.95rem;">No kids, no clock</span>
         </label>
+        <label class="field-label">Anything else?</label>
+        <input type="text" id="shower-other" placeholder="Optional notes or requests…">
         <div class="lock-action-row">
           <span class="lock-note">Set it now — or change it later, no pressure.</span>
           <button class="lock-btn" data-lock="shower">Set Plan</button>
@@ -499,35 +633,54 @@
     <!-- DINNER -->
     <div class="card" data-card data-section="dinner">
       <div class="card-head" data-toggle>
-        <div class="head-left"><span class="icon">🍽️</span><h3>Dinner</h3></div>
+        <div class="head-left"><span class="icon">🍽️</span><h3>Surf or Turf</h3></div>
         <div class="head-right"><span class="status-pill" data-status="dinner">not set</span><span class="chev">⌄</span></div>
       </div>
       <div class="card-body">
         <label class="field-label">What time?</label>
         <input type="time" id="dinner-time" value="19:30">
 
-        <label class="field-label">Out, or in?</label>
+        <label class="field-label">Surf, or Turf?</label>
         <div class="choice-grid">
-          <label class="chip radio"><input type="radio" name="dinner-where" value="out" checked><span>Out to eat</span></label>
-          <label class="chip radio"><input type="radio" name="dinner-where" value="in"><span>Chef's tasting menu at home</span></label>
+          <label class="chip radio"><input type="radio" name="dinner-where" value="out" checked><span>Out for Seafood</span></label>
+          <label class="chip radio"><input type="radio" name="dinner-where" value="in"><span>In for Steak</span></label>
         </div>
 
         <div id="dinner-out-panel">
+          <div class="hint">Just Molly + Dave — parents will babysit.</div>
           <label class="field-label">Where?</label>
           <div class="choice-grid">
-            <label class="chip radio"><input type="radio" name="dinner-out-where" value="Inlet View, Ocean Isle Beach"><span>Inlet View</span></label>
             <label class="chip radio"><input type="radio" name="dinner-out-where" value="Sharky's, Ocean Isle Beach"><span>Sharky's</span></label>
+            <label class="chip radio"><input type="radio" name="dinner-out-where" value="Jink's Creek"><span>Jink's Creek</span></label>
           </div>
         </div>
 
         <div id="dinner-in-panel" style="display:none;">
-          <label class="field-label">Tonight's theme</label>
-          <div class="choice-grid">
-            <label class="chip radio"><input type="radio" name="dinner-theme" value="Surf (baked white fish, fried shrimp)"><span>Surf</span></label>
-            <label class="chip radio"><input type="radio" name="dinner-theme" value="Turf (steaks)"><span>Turf</span></label>
-            <label class="chip radio"><input type="radio" name="dinner-theme" value="Surf and Turf"><span>Surf & Turf</span></label>
+          <label class="field-label">Sides</label>
+          <div class="choice-grid" data-group="dinner-sides">
+            <label class="chip"><input type="checkbox" value="Sweet Potatoes"><span>Sweet Potatoes</span></label>
+            <label class="chip"><input type="checkbox" value="Sautéed Squash"><span>Sautéed Squash</span></label>
+            <label class="chip"><input type="checkbox" value="Rice"><span>Rice</span></label>
+            <label class="chip"><input type="checkbox" value="Corn"><span>Corn</span></label>
+            <label class="chip"><input type="checkbox" value="Salad"><span>Salad</span></label>
           </div>
+
+          <label class="lock-row" style="margin-top:16px;">
+            <div class="toggle" data-toggle-switch id="dinner-invite-adults"><div class="knob"></div></div>
+            <span style="font-weight:700; font-size:.95rem;">With Bill and Carolyn</span>
+          </label>
+          <label class="lock-row" style="margin-top:10px;">
+            <div class="toggle" data-toggle-switch id="dinner-invite-kids"><div class="knob"></div></div>
+            <span style="font-weight:700; font-size:.95rem;">With Lovett, Sandy, and Ellen</span>
+          </label>
+          <label class="lock-row" style="margin-top:10px;">
+            <div class="toggle" data-toggle-switch id="dinner-invite-dave"><div class="knob"></div></div>
+            <span style="font-weight:700; font-size:.95rem;">With Dave</span>
+          </label>
         </div>
+
+        <label class="field-label">Anything else?</label>
+        <input type="text" id="dinner-other" placeholder="Optional notes or requests…">
 
         <div class="lock-action-row">
           <span class="lock-note">Set it now — or change it later, no pressure.</span>
@@ -567,6 +720,7 @@
   <footer>Happy Beach Birthday!</footer>
 </div>
 
+<div id="summon-tooltip">Need something? Tap this anytime and it'll get to Dave 🛟</div>
 <button id="summon-btn" aria-label="Summon Dave">🛟</button>
 
 <div id="summon-overlay">
@@ -688,7 +842,7 @@ const FINAL_MESSAGE = "Check back later for more reasons we love you.";
 const VIDEOS = [
   { who: "Lovett", id: "KnBcZC42eMI" },
   { who: "Sandy", id: "ZcC5VbuFGfY" },
-  { who: "Ellen", id: "" },
+  { who: "Ellen", id: "VD4rKGsBSqM" },
 ];
 
 /* =====================================================
@@ -704,6 +858,70 @@ const SECTION_LABELS = {
   swim: 'Canal swim', shower: 'Outside shower', dinner: 'Dinner'
 };
 const SECTION_ORDER = ['breakfast','reading','lunch','swim','shower','dinner'];
+
+/* ---------------- Shell collection ---------------- */
+const SHELLS_KEY = 'molly-birthday-shells-v1';
+const SHELL_TOTAL = SECTION_ORDER.length + LOVE_NOTES.length; // one per first-time lock + one per love note
+let shellCount = parseInt(localStorage.getItem(SHELLS_KEY) || '0', 10);
+
+function shellCaption(count, total){
+  if(count === 0) return "Every plan you set and every reason you find earns you a shell.";
+  if(count >= total) return "You found every single shell. That's the whole day, right there.";
+  if(count >= total * 0.66) return "Almost the whole collection.";
+  if(count >= total * 0.33) return "Nice haul so far.";
+  return "Just getting started.";
+}
+function renderShellBadge(){
+  document.getElementById('shell-badge-count').textContent = shellCount;
+}
+function renderShellGrid(){
+  document.getElementById('shell-panel-caption').textContent = shellCaption(shellCount, SHELL_TOTAL);
+  const grid = document.getElementById('shell-grid');
+  let html = '';
+  for(let i=0;i<SHELL_TOTAL;i++){
+    html += `<div class="shell-slot ${i < shellCount ? 'earned':''}">🐚</div>`;
+  }
+  grid.innerHTML = html;
+  document.getElementById('shell-watch-again').style.display = shellCount >= SHELL_TOTAL ? 'block' : 'none';
+}
+function earnShell(){
+  shellCount += 1;
+  localStorage.setItem(SHELLS_KEY, String(shellCount));
+  renderShellBadge();
+  const badge = document.getElementById('shell-badge');
+  badge.classList.remove('pulse');
+  void badge.offsetWidth;
+  badge.classList.add('pulse');
+
+  const toast = document.createElement('div');
+  toast.className = 'shell-toast';
+  toast.textContent = '+1 🐚';
+  document.body.appendChild(toast);
+  requestAnimationFrame(()=> toast.classList.add('show'));
+  setTimeout(()=>{ toast.classList.remove('show'); setTimeout(()=> toast.remove(), 400); }, 1400);
+
+  if(shellCount === SHELL_TOTAL){
+    fireBigConfetti();
+    setTimeout(()=>{
+      document.getElementById('reward-overlay').classList.add('show');
+    }, 1600);
+  }
+}
+(function(){
+  renderShellBadge();
+  const badge = document.getElementById('shell-badge');
+  const overlay = document.getElementById('shell-overlay');
+  const closeBtn = document.getElementById('shell-panel-close');
+  badge.addEventListener('click', ()=>{ renderShellGrid(); overlay.classList.add('show'); });
+  closeBtn.addEventListener('click', ()=> overlay.classList.remove('show'));
+  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) overlay.classList.remove('show'); });
+
+  const rewardOverlay = document.getElementById('reward-overlay');
+  const rewardClose = document.getElementById('reward-close');
+  rewardClose.addEventListener('click', ()=> rewardOverlay.classList.remove('show'));
+  rewardOverlay.addEventListener('click', (e)=>{ if(e.target === rewardOverlay) rewardOverlay.classList.remove('show'); });
+  document.getElementById('shell-watch-again').addEventListener('click', ()=> rewardOverlay.classList.add('show'));
+})();
 
 /* ---------------- Sun arc scroll ---------------- */
 const sunArcPath = document.getElementById('sun-arc-path');
@@ -820,25 +1038,31 @@ function readSection(section){
   switch(section){
     case 'breakfast': return {
       time: val('bf-time'), drinks: getChecked('bf-drink'), sides: getChecked('bf-side'),
-      mixins: getChecked('bf-mixin'), mixinOther: val('bf-mixin-other'), main: getChecked('bf-main')
+      mixins: getChecked('bf-mixin'), mixinOther: val('bf-mixin-other'), main: getChecked('bf-main'),
+      other: val('bf-other')
     };
-    case 'reading': return { time: val('read-time'), noTimeLimit: isOn('read-lock') };
+    case 'reading': return { time: val('read-time'), noTimeLimit: isOn('read-lock'), other: val('read-other') };
     case 'lunch': {
       const where = radioVal('lunch-where');
-      const d = { time: val('lunch-time'), where };
+      const d = { time: val('lunch-time'), where, inviteAdults: isOn('lunch-invite-adults'), inviteKids: isOn('lunch-invite-kids'), inviteDave: isOn('lunch-invite-dave'), other: val('lunch-other') };
       if(where === 'home'){
         d.bread = radioVal('lunch-bread'); d.toppings = getChecked('lunch-toppings');
         d.chips = val('lunch-chips'); d.dessert = document.getElementById('lunch-dessert').checked;
       } else { d.restaurant = radioVal('lunch-out-where'); }
       return d;
     }
-    case 'swim': return { time: val('swim-time'), inviteAdults: isOn('swim-invite-adults'), inviteKids: isOn('swim-invite-kids') };
-    case 'shower': return { time: val('shower-time'), protectedTime: isOn('shower-lock') };
+    case 'swim': return { time: val('swim-time'), inviteAdults: isOn('swim-invite-adults'), inviteKids: isOn('swim-invite-kids'), other: val('swim-other') };
+    case 'shower': return { time: val('shower-time'), protectedTime: isOn('shower-lock'), other: val('shower-other') };
     case 'dinner': {
       const where = radioVal('dinner-where');
-      const d = { time: val('dinner-time'), where };
+      const d = { time: val('dinner-time'), where, other: val('dinner-other') };
       if(where === 'out'){ d.restaurant = radioVal('dinner-out-where'); }
-      else { d.theme = radioVal('dinner-theme'); }
+      else {
+        d.sides = getChecked('dinner-sides');
+        d.inviteAdults = isOn('dinner-invite-adults');
+        d.inviteKids = isOn('dinner-invite-kids');
+        d.inviteDave = isOn('dinner-invite-dave');
+      }
       return d;
     }
   }
@@ -849,11 +1073,13 @@ function writeSection(section, d){
     case 'breakfast':
       setVal('bf-time', d.time); setChecked('bf-drink', d.drinks); setChecked('bf-side', d.sides);
       setChecked('bf-mixin', d.mixins); setVal('bf-mixin-other', d.mixinOther); setChecked('bf-main', d.main);
+      setVal('bf-other', d.other);
       document.getElementById('bf-yogurt-panel').classList.toggle('show', (d.sides||[]).some(s=>['Granola','Yogurt'].includes(s)));
       break;
-    case 'reading': setVal('read-time', d.time); setOn('read-lock', d.noTimeLimit); break;
+    case 'reading': setVal('read-time', d.time); setOn('read-lock', d.noTimeLimit); setVal('read-other', d.other); break;
     case 'lunch':
       setVal('lunch-time', d.time); setRadio('lunch-where', d.where);
+      setOn('lunch-invite-adults', d.inviteAdults); setOn('lunch-invite-kids', d.inviteKids); setOn('lunch-invite-dave', d.inviteDave); setVal('lunch-other', d.other);
       document.getElementById('lunch-home-panel').style.display = d.where === 'home' ? 'block' : 'none';
       document.getElementById('lunch-out-panel').style.display = d.where === 'home' ? 'none' : 'block';
       if(d.where === 'home'){
@@ -861,21 +1087,37 @@ function writeSection(section, d){
         setVal('lunch-chips', d.chips); document.getElementById('lunch-dessert').checked = !!d.dessert;
       } else { setRadio('lunch-out-where', d.restaurant); }
       break;
-    case 'swim': setVal('swim-time', d.time); setOn('swim-invite-adults', d.inviteAdults); setOn('swim-invite-kids', d.inviteKids); checkSwimWindow(); break;
-    case 'shower': setVal('shower-time', d.time); setOn('shower-lock', d.protectedTime); break;
+    case 'swim': setVal('swim-time', d.time); setOn('swim-invite-adults', d.inviteAdults); setOn('swim-invite-kids', d.inviteKids); setVal('swim-other', d.other); checkSwimWindow(); break;
+    case 'shower': setVal('shower-time', d.time); setOn('shower-lock', d.protectedTime); setVal('shower-other', d.other); break;
     case 'dinner':
-      setVal('dinner-time', d.time); setRadio('dinner-where', d.where);
+      setVal('dinner-time', d.time); setRadio('dinner-where', d.where); setVal('dinner-other', d.other);
       document.getElementById('dinner-out-panel').style.display = d.where === 'out' ? 'block' : 'none';
       document.getElementById('dinner-in-panel').style.display = d.where === 'out' ? 'none' : 'block';
-      if(d.where === 'out'){ setRadio('dinner-out-where', d.restaurant); } else { setRadio('dinner-theme', d.theme); }
+      if(d.where === 'out'){ setRadio('dinner-out-where', d.restaurant); } else {
+        setChecked('dinner-sides', d.sides);
+        setOn('dinner-invite-adults', d.inviteAdults);
+        setOn('dinner-invite-kids', d.inviteKids);
+        setOn('dinner-invite-dave', d.inviteDave);
+      }
       break;
   }
 }
 function summaryLine(section, d){
+  const base = summaryLineBase(section, d);
+  return d.other ? `${base} — "${d.other}"` : base;
+}
+function summaryLineBase(section, d){
   switch(section){
     case 'breakfast': return [...(d.main||[]), ...(d.drinks||[])].join(', ') || 'set';
     case 'reading': return d.noTimeLimit ? 'no time limit' : 'flexible';
-    case 'lunch': return d.where === 'home' ? (d.bread || 'menu set') : (d.restaurant || 'restaurant set');
+    case 'lunch': {
+      const base = d.where === 'home' ? (d.bread || 'menu set') : (d.restaurant || 'restaurant set');
+      const who = [];
+      if(d.inviteAdults) who.push('Bill & Carolyn');
+      if(d.inviteKids) who.push('Lovett, Sandy & Ellen');
+      if(d.inviteDave) who.push('Dave');
+      return who.length ? `${base}, with ${who.join(' + ')}` : base;
+    }
     case 'swim': {
       const who = [];
       if(d.inviteAdults) who.push('Bill, Carolyn & adult family');
@@ -883,7 +1125,15 @@ function summaryLine(section, d){
       return who.length ? who.join(' + ') : 'just the two of you';
     }
     case 'shower': return d.protectedTime ? 'no kids, no clock' : 'set';
-    case 'dinner': return d.where === 'out' ? (d.restaurant || 'restaurant set') : (d.theme || 'tasting menu set');
+    case 'dinner': {
+      if(d.where === 'out') return d.restaurant ? `${d.restaurant} (just the two of you)` : 'restaurant set';
+      const base = (d.sides||[]).join(', ') || 'steak, sides TBD';
+      const who = [];
+      if(d.inviteAdults) who.push('Bill & Carolyn');
+      if(d.inviteKids) who.push('Lovett, Sandy & Ellen');
+      if(d.inviteDave) who.push('Dave');
+      return who.length ? `${base}, with ${who.join(' + ')}` : base;
+    }
   }
 }
 
@@ -940,6 +1190,7 @@ document.querySelectorAll('[data-lock]').forEach(btn=>{
     const wasAlreadyLocked = !!(store[section] && store[section].locked);
     store[section] = { locked:true, dirty:false, lockedAt: Date.now(), data };
     saveStore(store);
+    if(!wasAlreadyLocked) earnShell();
     refreshStatusUI(section);
     renderTimeline();
 
@@ -1006,7 +1257,7 @@ renderTimeline();
       ? `Hide what you've found (${state.revealedCount})`
       : `See what you've found so far (${state.revealedCount})`;
     historyList.innerHTML = LOVE_NOTES.slice(0, state.revealedCount).slice().reverse()
-      .map(n => `<div class="history-item">"${n}"</div>`).join('');
+      .map(n => `<div class="history-item">${n}</div>`).join('');
   }
 
   function render(){
@@ -1016,14 +1267,14 @@ renderTimeline();
     if(state.revealedCount === 0){
       area.innerHTML = `<div class="note-card"><button class="reveal-btn" id="reveal-btn">Reveal a reason we love you</button></div>`;
     } else if(state.revealedCount >= total){
-      area.innerHTML = `<div class="note-card"><div class="note-text">"${lastNote}"</div><div class="note-count">${FINAL_MESSAGE}</div></div>`;
+      area.innerHTML = `<div class="note-card"><div class="note-text">${lastNote}</div><div class="note-count">${FINAL_MESSAGE}</div></div>`;
     } else {
       const elapsed = Date.now() - state.lastRevealAt;
       if(elapsed >= NOTE_INTERVAL_MS){
-        area.innerHTML = `<div class="note-card"><div class="note-text">"${lastNote}"</div><div class="note-count" style="margin-bottom:14px;">${state.revealedCount} of ${total} found</div><button class="reveal-btn" id="reveal-btn">Reveal the next one</button></div>`;
+        area.innerHTML = `<div class="note-card"><div class="note-text">${lastNote}</div><div class="note-count" style="margin-bottom:14px;">${state.revealedCount} of ${total} found</div><button class="reveal-btn" id="reveal-btn">Reveal the next one</button></div>`;
       } else {
         const mins = Math.max(1, Math.ceil((NOTE_INTERVAL_MS - elapsed) / 60000));
-        area.innerHTML = `<div class="note-card"><div class="note-text">"${lastNote}"</div><div class="note-count">${state.revealedCount} of ${total} · next one in ${mins} min</div></div>`;
+        area.innerHTML = `<div class="note-card"><div class="note-text">${lastNote}</div><div class="note-count">${state.revealedCount} of ${total} · next one in ${mins} min</div></div>`;
       }
     }
 
@@ -1033,6 +1284,7 @@ renderTimeline();
         state.revealedCount += 1;
         state.lastRevealAt = Date.now();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        earnShell();
         render();
         renderHistory();
       });
@@ -1071,13 +1323,36 @@ renderTimeline();
   const KEY = 'molly-birthday-onboarded-v1';
   const banner = document.getElementById('onboarding-banner');
   const dismissBtn = document.getElementById('onboarding-dismiss');
-  if(!localStorage.getItem(KEY)){
-    setTimeout(()=> banner.classList.add('show'), 600);
-  }
-  dismissBtn.addEventListener('click', ()=>{
-    localStorage.setItem(KEY, '1');
+  document.body.style.transition = 'padding-top .4s ease';
+
+  function hide(){
     banner.classList.remove('show');
-  });
+    document.body.style.paddingTop = '0px';
+  }
+
+  if(!localStorage.getItem(KEY)){
+    localStorage.setItem(KEY, '1'); // mark seen immediately — shows once, ever, regardless of dismissal
+    setTimeout(()=>{
+      banner.classList.add('show');
+      document.body.style.paddingTop = banner.offsetHeight + 'px';
+      setTimeout(hide, 5000); // auto-hide so it doesn't linger over the shell badge
+    }, 600);
+  }
+  dismissBtn.addEventListener('click', hide);
+})();
+
+/* ---------------- One-time Summon Dave tooltip ---------------- */
+(function(){
+  const KEY = 'molly-birthday-buoy-tip-v1';
+  const tip = document.getElementById('summon-tooltip');
+  if(!localStorage.getItem(KEY)){
+    setTimeout(()=>{
+      tip.classList.add('show');
+      setTimeout(()=> tip.classList.remove('show'), 6000);
+    }, 2200);
+    localStorage.setItem(KEY, '1');
+  }
+  document.getElementById('summon-btn').addEventListener('click', ()=> tip.classList.remove('show'));
 })();
 
 /* ---------------- Summon Dave ---------------- */
@@ -1134,27 +1409,34 @@ const DAVE_PHONE = "+17045640046";
   });
 })();
 
+/* ---------------- Confetti (shared) ---------------- */
+const CONFETTI_COLORS = ['#FF6F59','#FFC94D','#0F6E85','#FFFBF2','#E5533E'];
+function fireConfetti(count=28){
+  for(let i=0;i<count;i++){
+    const p = document.createElement('div');
+    p.className='confetti-piece';
+    p.style.left = Math.random()*100 + 'vw';
+    p.style.background = CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)];
+    p.style.transform = `rotate(${Math.random()*360}deg)`;
+    p.style.transition = `transform ${1.4+Math.random()}s ease-in, top ${1.4+Math.random()}s ease-in, opacity .3s ease ${1+Math.random()}s`;
+    document.body.appendChild(p);
+    requestAnimationFrame(()=>{
+      p.style.top = '100vh';
+      p.style.transform += ` translateX(${(Math.random()-0.5)*160}px)`;
+      p.style.opacity = '0';
+    });
+    setTimeout(()=>p.remove(), 3200);
+  }
+}
+function fireBigConfetti(){
+  fireConfetti(90);
+  setTimeout(()=> fireConfetti(70), 300);
+  setTimeout(()=> fireConfetti(50), 650);
+}
+
 /* ---------------- Easter egg: tap the sun / umbrella ---------------- */
 (function(){
   let taps = 0;
-  const colors = ['#FF6F59','#FFC94D','#0F6E85','#FFFBF2'];
-  function confetti(){
-    for(let i=0;i<28;i++){
-      const p = document.createElement('div');
-      p.className='confetti-piece';
-      p.style.left = Math.random()*100 + 'vw';
-      p.style.background = colors[Math.floor(Math.random()*colors.length)];
-      p.style.transform = `rotate(${Math.random()*360}deg)`;
-      p.style.transition = `transform ${1.4+Math.random()}s ease-in, top ${1.4+Math.random()}s ease-in, opacity .3s ease ${1+Math.random()}s`;
-      document.body.appendChild(p);
-      requestAnimationFrame(()=>{
-        p.style.top = '100vh';
-        p.style.transform += ` translateX(${(Math.random()-0.5)*120}px)`;
-        p.style.opacity = '0';
-      });
-      setTimeout(()=>p.remove(), 3000);
-    }
-  }
   function showEgg(msg){
     const el = document.createElement('div');
     el.className = 'egg-msg';
@@ -1165,7 +1447,7 @@ const DAVE_PHONE = "+17045640046";
   }
   function handleTap(){
     taps++;
-    if(taps === 3){ confetti(); showEgg("found one — happy birthday, my love 🐚"); taps = 0; }
+    if(taps === 3){ fireConfetti(28); showEgg("found one — happy birthday, my love 🐚"); taps = 0; }
   }
   sunDot.addEventListener('click', handleTap);
   document.getElementById('umbrella-egg').addEventListener('click', handleTap);
